@@ -22,7 +22,7 @@ class TranslationManager:
             'error_generic': 'Error: {}',
             'youtube_blocked_title': '⚠️ YouTube Notice',
             'youtube_blocked_desc': 'YouTube blocks video downloads from cloud hosting servers. To download YouTube videos with 100% success and top speed, please use our free Desktop Application (Windows).',
-            'download_desktop_btn': '⬇️ Download Desktop App for YouTube (Windows)',
+            'download_desktop_btn': '⬇️ Download Desktop App for YouTube (Windows EXE)',
             'platforms_supported': 'Supports Instagram, TikTok, Facebook, Twitter (X), Pinterest, Vimeo, and 1000+ sites.',
             'lang_label': 'Language / اللغة:',
             'clean_btn': 'Clear Cache 🧹',
@@ -31,7 +31,13 @@ class TranslationManager:
             'updating_engine': 'Updating core downloader engine... Please wait.',
             'engine_updated_success': 'Engine updated successfully! Current version: {}',
             'engine_update_failed': 'Failed to update engine: {}',
-            'engine_version_label': 'Engine: yt-dlp {}'
+            'engine_version_label': 'Engine: yt-dlp {}',
+            'install_shortcut_btn': '📲 Add App Shortcut to Mobile Home Screen',
+            'install_guide_title': '📱 How to install as a Home Screen App:',
+            'install_ios_title': '🍏 iPhone & iPad (Safari)',
+            'install_ios_desc': "1. Tap the **Share** button `⎋` (square with arrow up at the bottom).\n2. Scroll down and tap **'Add to Home Screen'** `➕`.\n3. Tap **'Add'** in the top right corner.\n\n✨ The app icon will appear on your home screen and open in full-screen standalone mode!",
+            'install_android_title': '🤖 Android (Chrome)',
+            'install_android_desc': "1. Tap the **three dots menu** `⋮` in the top right of Chrome.\n2. Tap **'Install app'** or **'Add to Home screen'** `➕`.\n3. Tap **'Install'** to confirm.\n\n✨ The app icon will be installed directly on your home screen like any native app!"
         },
         'ar': {
             'app_title': 'ريمـو أوكـس - محمل الفيديوهات (ويب)',
@@ -62,7 +68,13 @@ class TranslationManager:
             'updating_engine': 'جاري تحديث محرك التحميل إلى أحدث إصدار... يرجى الانتظار.',
             'engine_updated_success': 'تم تحديث المحرك بنجاح! الإصدار الحالي: {}',
             'engine_update_failed': 'فشل تحديث المحرك: {}',
-            'engine_version_label': 'المحرك: yt-dlp {}'
+            'engine_version_label': 'المحرك: yt-dlp {}',
+            'install_shortcut_btn': '📲 تثبيت أيقونة التطبيق على شاشة هاتفك',
+            'install_guide_title': '📱 طريقة إضافة أيقونة التطبيق للشاشة الرئيسية لهاتفك:',
+            'install_ios_title': '🍏 هواتف آيفون (iPhone عبر متصفح Safari)',
+            'install_ios_desc': "1. اضغط على زر **المشاركة** `⎋` (مربع بسهم لأعلى في شريط المتصفح بالأسفل).\n2. اسحب للأسفل واختر **'إضافة إلى الصفحة الرئيسية'** `➕` (Add to Home Screen).\n3. اضغط على **'إضافة'** (Add) في أعلى اليمين.\n\n✨ ستظهر أيقونة التطبيق فوراً على شاشة هاتفك وتفتح كتطبيق حقيقي ملء الشاشة بدون شريط المتصفح!",
+            'install_android_title': '🤖 هواتف أندرويد (Android عبر متصفح Chrome)',
+            'install_android_desc': "1. اضغط على قائمة **الثلاث نقاط** `⋮` في أعلى متصفح كروم.\n2. اختر **'تثبيت التطبيق'** (Install app) أو **'إضافة إلى الشاشة الرئيسية'** `➕`.\n3. اضغط على **'تثبيت'** للتأكيد.\n\n✨ ستضاف أيقونة التطبيق إلى شاشة هاتفك وتعمل كتطبيق مستقل بضغطة زر واحدة!"
         }
     }
 

@@ -31,26 +31,62 @@ class RemoOxWebApp:
             st.session_state.download_result = None
 
     def inject_custom_styles(self):
-        """Injects mobile-first responsive CSS styling."""
+        """Injects mobile-first responsive CSS styling and hides GitHub/Fork/branding."""
         is_rtl = self.translations.is_rtl
         direction = "rtl" if is_rtl else "ltr"
         text_align = "right" if is_rtl else "left"
 
         st.markdown(f"""
+        <!-- PWA Mobile Web App Meta Tags -->
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-title" content="REMO_OX">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="theme-color" content="#0e1117">
+
         <style>
-            /* Main container */
+            /* 1. HIDE ALL STREAMLIT HEADER, TOOLBAR, FORK BUTTON, GITHUB ICONS & MANAGE APP */
+            header[data-testid="stHeader"],
+            [data-testid="stToolbar"],
+            [data-testid="stToolbarActions"],
+            [data-testid="stDecoration"],
+            [data-testid="stStatusWidget"],
+            .stDeployButton,
+            #MainMenu,
+            footer,
+            div:has(> a[href*="github.com"]),
+            a[href*="github.com"],
+            #manage-app-button,
+            [data-testid="manage-app-button"],
+            button#manage-app-button,
+            div[class*="viewerBadge"],
+            div[class*="manageApp"],
+            .viewerBadge_container__r5tak,
+            .viewerBadge_link__1S137,
+            div:has(> #manage-app-button) {{
+                display: none !important;
+                visibility: hidden !important;
+                height: 0 !important;
+                width: 0 !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }}
+
+            /* 2. Main container */
             .main .block-container {{
                 direction: {direction};
                 text-align: {text_align};
                 max-width: 780px;
-                padding-top: 1.5rem;
+                padding-top: 1.5rem !important;
                 padding-bottom: 3rem;
             }}
             
             /* App header */
             .app-header {{
                 text-align: center;
-                padding: 5px 0 20px 0;
+                padding: 5px 0 15px 0;
             }}
             .app-title {{
                 color: #00d2ff;
@@ -140,8 +176,8 @@ class RemoOxWebApp:
             /* Supported badges */
             .badge-row {{
                 text-align: center;
-                margin-top: 30px;
-                padding-top: 20px;
+                margin-top: 25px;
+                padding-top: 15px;
                 border-top: 1px solid #232936;
             }}
             .platform-tag {{
@@ -153,6 +189,14 @@ class RemoOxWebApp:
                 border-radius: 6px;
                 font-size: 0.85rem;
                 font-weight: 500;
+            }}
+
+            /* Footer credit */
+            .footer-credit {{
+                text-align: center;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 1px solid #1e2433;
             }}
         </style>
         """, unsafe_allow_html=True)
@@ -187,6 +231,26 @@ class RemoOxWebApp:
             <p class="app-subtitle">{self.translations.get('app_subtitle')}</p>
         </div>
         """, unsafe_allow_html=True)
+
+    def render_pwa_guide(self):
+        """Renders shortcut installation guide for mobile users."""
+        with st.expander(self.translations.get('install_shortcut_btn'), expanded=False):
+            st.markdown(f"#### {self.translations.get('install_guide_title')}")
+            col_ios, col_and = st.columns(2)
+            with col_ios:
+                st.markdown(f"""
+                <div style="background: #161b22; padding: 14px; border-radius: 8px; border: 1px solid #2d3748; height: 100%;">
+                    <h4 style="color: #00d2ff; margin-top: 0;">{self.translations.get('install_ios_title')}</h4>
+                    <p style="color: #cbd5e0; font-size: 0.9rem; line-height: 1.6; white-space: pre-line;">{self.translations.get('install_ios_desc')}</p>
+                </div>
+                """, unsafe_allow_html=True)
+            with col_and:
+                st.markdown(f"""
+                <div style="background: #161b22; padding: 14px; border-radius: 8px; border: 1px solid #2d3748; height: 100%;">
+                    <h4 style="color: #00d2ff; margin-top: 0;">{self.translations.get('install_android_title')}</h4>
+                    <p style="color: #cbd5e0; font-size: 0.9rem; line-height: 1.6; white-space: pre-line;">{self.translations.get('install_android_desc')}</p>
+                </div>
+                """, unsafe_allow_html=True)
 
     def render_input_section(self):
         """Renders URL input, format, and quality controls."""
@@ -285,8 +349,7 @@ class RemoOxWebApp:
             )
 
     def render_footer(self):
-        """Renders supported platform badges and footer credits."""
-        engine_ver = MediaDownloader.get_engine_version()
+        """Renders supported platform badges and ONLY Developed By REMO_OX."""
         st.markdown(f"""
         <div class="badge-row">
             <span class="platform-tag">🟣 Instagram</span>
@@ -295,8 +358,10 @@ class RemoOxWebApp:
             <span class="platform-tag">⚪ Twitter / X</span>
             <span class="platform-tag">🔴 Pinterest</span>
             <span class="platform-tag">🌐 1000+ Platforms</span>
-            <p style="color: #6b7280; font-size: 0.8rem; margin-top: 15px;">
-                {AppConfig.DISPLAY_NAME} ({AppConfig.VERSION}) • Core: yt-dlp {engine_ver} • Developed by {AppConfig.AUTHOR}
+        </div>
+        <div class="footer-credit">
+            <p style="color: #00d2ff; font-weight: 700; font-size: 1rem; letter-spacing: 0.5px; margin: 0;">
+                Developed By REMO_OX
             </p>
         </div>
         """, unsafe_allow_html=True)
@@ -305,6 +370,7 @@ class RemoOxWebApp:
         """Application execution pipeline."""
         self.inject_custom_styles()
         self.render_header()
+        self.render_pwa_guide()
         self.render_input_section()
         self.render_download_result()
         self.render_footer()
