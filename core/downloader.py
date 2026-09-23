@@ -10,7 +10,7 @@ from .config import AppConfig
 class MediaDownloader:
     """Encapsulates media extraction and downloading using yt-dlp and ffmpeg."""
 
-    DESKTOP_RELEASE_URL = "https://github.com/remonedward/REMO_OX-Downloader/releases/tag/v2.0"
+    DESKTOP_RELEASE_URL = "https://github.com/remonedward/REMO_OX-Downloader/releases/download/v2.0/REMO_OX_Downloader_v2.exe"
 
     def __init__(self):
         self.temp_dir = AppConfig.ensure_temp_dir()
