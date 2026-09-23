@@ -27,13 +27,11 @@ class RemoOxWebApp:
         """Initializes persistent Streamlit session variables."""
         if 'lang' not in st.session_state:
             st.session_state.lang = 'ar'
-        if 'media_info' not in st.session_state:
-            st.session_state.media_info = None
         if 'download_result' not in st.session_state:
             st.session_state.download_result = None
 
     def inject_custom_styles(self):
-        """Injects mobile-first responsive CSS styling with dark neon theme."""
+        """Injects mobile-first responsive CSS styling matching the desktop app."""
         is_rtl = self.translations.is_rtl
         direction = "rtl" if is_rtl else "ltr"
         text_align = "right" if is_rtl else "left"
@@ -49,7 +47,7 @@ class RemoOxWebApp:
                 padding-bottom: 3rem;
             }}
             
-            /* App title styling */
+            /* App header */
             .app-header {{
                 text-align: center;
                 padding: 5px 0 15px 0;
@@ -58,13 +56,13 @@ class RemoOxWebApp:
                 color: #00d2ff;
                 font-size: 2.1rem;
                 font-weight: 800;
-                margin-bottom: 6px;
+                margin-bottom: 4px;
                 letter-spacing: -0.5px;
             }}
             .app-subtitle {{
                 color: #a0aec0;
                 font-size: 0.95rem;
-                margin-bottom: 10px;
+                margin-bottom: 8px;
             }}
             .version-badge {{
                 display: inline-block;
@@ -74,6 +72,31 @@ class RemoOxWebApp:
                 padding: 3px 10px;
                 border-radius: 12px;
                 font-size: 0.75rem;
+            }}
+            .engine-tag {{
+                display: inline-block;
+                background: #0f2738;
+                color: #00d2ff;
+                border: 1px solid #00d2ff;
+                padding: 3px 8px;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                margin-top: 6px;
+            }}
+
+            /* Bypass Card Box matching desktop EXE */
+            .bypass-card {{
+                background-color: #161b22;
+                border: 1.5px solid #2d3748;
+                border-radius: 10px;
+                padding: 15px 18px 10px 18px;
+                margin: 15px 0;
+            }}
+            .bypass-title {{
+                color: #00d2ff;
+                font-size: 0.95rem;
+                font-weight: bold;
+                margin-bottom: 12px;
             }}
 
             /* Input box */
@@ -90,18 +113,32 @@ class RemoOxWebApp:
                 box-shadow: 0 0 10px rgba(0, 210, 255, 0.2) !important;
             }}
 
-            /* Buttons */
-            .stButton > button {{
+            /* Primary Download Button (Big Blue matching EXE) */
+            .stButton > button[kind="primary"] {{
+                width: 100% !important;
+                background-color: #0078d7 !important;
+                color: white !important;
+                font-size: 1.15rem !important;
+                font-weight: bold !important;
+                padding: 12px !important;
+                border: none !important;
                 border-radius: 8px !important;
-                font-weight: 600 !important;
-                padding: 8px 16px !important;
+                box-shadow: 0 4px 15px rgba(0, 120, 215, 0.4) !important;
                 transition: all 0.2s ease-in-out !important;
             }}
-            .stButton > button:hover {{
+            .stButton > button[kind="primary"]:hover {{
+                background-color: #008aff !important;
+                box-shadow: 0 6px 20px rgba(0, 138, 255, 0.6) !important;
                 transform: translateY(-1px);
             }}
 
-            /* Download to device button */
+            /* Secondary buttons */
+            .stButton > button {{
+                border-radius: 8px !important;
+                font-weight: 600 !important;
+            }}
+
+            /* Direct save button for mobile */
             .stDownloadButton > button {{
                 width: 100% !important;
                 background: linear-gradient(135deg, #00d2ff 0%, #0078d7 100%) !important;
@@ -111,11 +148,7 @@ class RemoOxWebApp:
                 padding: 14px !important;
                 border: none !important;
                 border-radius: 10px !important;
-                box-shadow: 0 4px 15px rgba(0, 210, 255, 0.3) !important;
-            }}
-            .stDownloadButton > button:hover {{
-                box-shadow: 0 6px 20px rgba(0, 210, 255, 0.5) !important;
-                color: #000 !important;
+                box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4) !important;
             }}
 
             /* Supported badges */
@@ -134,16 +167,6 @@ class RemoOxWebApp:
                 border-radius: 6px;
                 font-size: 0.8rem;
             }}
-            .engine-tag {{
-                display: inline-block;
-                background: #0f2738;
-                color: #00d2ff;
-                border: 1px solid #00d2ff;
-                padding: 3px 8px;
-                border-radius: 6px;
-                font-size: 0.75rem;
-                margin-top: 8px;
-            }}
         </style>
         """, unsafe_allow_html=True)
 
@@ -152,7 +175,6 @@ class RemoOxWebApp:
         col1, col2, col3 = st.columns([3, 2, 2])
         
         with col2:
-            # The Update Engine button
             if st.button(self.translations.get('update_engine_btn'), key="btn_update_engine", use_container_width=True):
                 with st.spinner(self.translations.get('updating_engine')):
                     ok, version, msg = MediaDownloader.upgrade_engine()
@@ -180,13 +202,14 @@ class RemoOxWebApp:
         """, unsafe_allow_html=True)
 
     def render_input_section(self):
-        """Renders URL input, format options, and advanced settings."""
+        """Renders URL input, format, quality, and the YouTube Bypass Settings box."""
         url = st.text_input(
             label=self.translations.get('url_input_label'),
             placeholder=self.translations.get('url_placeholder'),
             key="url_input"
         )
 
+        # Format & Quality
         col_fmt, col_qty = st.columns(2)
         with col_fmt:
             format_choice = st.selectbox(
@@ -203,55 +226,65 @@ class RemoOxWebApp:
                 disabled=is_audio
             )
 
-        # Advanced Settings Expander (Bypass client & Cookies support)
-        with st.expander(self.translations.get('adv_settings'), expanded=False):
+        # ⚡ YouTube Bypass & Security Settings (Visible on main screen exactly like EXE)
+        st.markdown(f"""
+        <div class="bypass-card">
+            <div class="bypass-title">{self.translations.get('bypass_header')}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        col_cook, col_byp = st.columns(2)
+        with col_cook:
+            cookie_options = {
+                self.translations.get('cookie_none'): 'none',
+                self.translations.get('cookie_chrome'): 'chrome',
+                self.translations.get('cookie_edge'): 'edge',
+                self.translations.get('cookie_firefox'): 'firefox',
+                self.translations.get('cookie_brave'): 'brave',
+                self.translations.get('cookie_opera'): 'opera'
+            }
+            selected_cookie_label = st.selectbox(
+                label=self.translations.get('cookies_label'),
+                options=list(cookie_options.keys()),
+                index=0
+            )
+            selected_cookie = cookie_options[selected_cookie_label]
+
+        with col_byp:
             client_options = {
                 self.translations.get('client_auto'): 'auto',
-                self.translations.get('client_tv'): 'tv',
+                self.translations.get('client_ios'): 'ios',
                 self.translations.get('client_android'): 'android',
                 self.translations.get('client_web'): 'web'
             }
             selected_client_label = st.selectbox(
-                label=self.translations.get('client_mode_label'),
+                label=self.translations.get('client_label'),
                 options=list(client_options.keys()),
                 index=0
             )
-            client_mode = client_options[selected_client_label]
+            selected_client = client_options[selected_client_label]
 
-            cookies_text = st.text_area(
-                label=self.translations.get('cookies_label'),
-                placeholder=self.translations.get('cookies_placeholder'),
-                height=80,
-                key="cookies_input"
-            )
-
-        col_action, col_clear = st.columns([3, 1])
-        with col_action:
-            start_clicked = st.button(
-                self.translations.get('download_btn'),
-                type="primary",
-                use_container_width=True
-            )
-        with col_clear:
-            if st.button(self.translations.get('clean_btn'), use_container_width=True):
-                count = TempCleaner.clear_all()
-                st.session_state.download_result = None
-                st.toast(self.translations.get('clean_done'))
+        # Big Download Now Button
+        start_clicked = st.button(
+            self.translations.get('download_btn'),
+            type="primary",
+            use_container_width=True
+        )
 
         if start_clicked:
             if not url or len(url.strip()) < 5:
                 st.error(self.translations.get('error_empty_url'))
             else:
-                self.process_download(url.strip(), is_audio, quality_choice, cookies_text, client_mode)
+                self.process_download(url.strip(), is_audio, quality_choice, selected_cookie, selected_client)
 
-    def process_download(self, url, is_audio, quality, cookies_text=None, client_mode="auto"):
+    def process_download(self, url, is_audio, quality, cookies_browser="none", client_mode="auto"):
         """Executes the download and handles results."""
         with st.spinner(self.translations.get('processing')):
             success, file_path, filename, mime_type, err = self.downloader.download(
                 url=url,
                 is_audio=is_audio,
                 quality=quality,
-                cookies_text=cookies_text,
+                cookies_browser=cookies_browser,
                 client_mode=client_mode
             )
 
