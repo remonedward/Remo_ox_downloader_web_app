@@ -51,6 +51,12 @@ class MediaDownloader:
             'js_runtimes': {'node': {}},
         }
 
+        try:
+            from yt_dlp.networking.impersonate import ImpersonateTarget
+            opts['impersonate'] = ImpersonateTarget.from_str('chrome')
+        except Exception:
+            pass
+
         if self.ffmpeg_path:
             opts['ffmpeg_location'] = self.ffmpeg_path
 
@@ -170,6 +176,8 @@ class MediaDownloader:
             err_msg = str(e)
             if "confirm you're not a bot" in err_msg.lower() or "sign in" in err_msg.lower():
                 err_msg = "BOT_DETECTED"
+            elif "video is unavailable" in err_msg.lower() or "unavailable" in err_msg.lower() or "not available" in err_msg.lower():
+                err_msg = "هذا الفيديو غير متاح على يوتيوب (قد يكون محذوفاً أو خاصاً)."
             return False, None, None, None, err_msg
         finally:
             if cookies_file and os.path.exists(cookies_file):
