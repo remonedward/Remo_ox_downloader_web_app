@@ -1,3 +1,5 @@
 streamlit>=1.35.0
-yt-dlp>=2024.08.0
+yt-dlp[default]>=2024.08.0
+yt-dlp-ejs>=0.8.0
+curl-cffi>=0.7.0
 requests>=2.31.0
