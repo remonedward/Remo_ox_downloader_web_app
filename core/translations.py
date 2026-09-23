@@ -30,7 +30,12 @@ class TranslationManager:
             'engine_updated_success': 'Engine updated successfully! Current version: {}',
             'engine_update_failed': 'Failed to update engine: {}',
             'engine_version_label': 'Engine: yt-dlp {}',
-            'adv_settings': '⚙️ Advanced Settings (Optional Cookies)',
+            'adv_settings': '⚙️ Advanced Settings (Bypass & Cookies)',
+            'client_mode_label': 'Bypass Mode:',
+            'client_auto': 'Smart Auto (VisionOS / Recommended)',
+            'client_tv': 'TV / Embedded Player',
+            'client_android': 'Android Player',
+            'client_web': 'Standard Web Player',
             'cookies_label': 'YouTube Cookies (Optional Netscape format):',
             'cookies_placeholder': 'Paste cookies.txt content here to bypass strict restrictions if any...'
         },
@@ -62,7 +67,12 @@ class TranslationManager:
             'engine_updated_success': 'تم تحديث المحرك بنجاح! الإصدار الحالي: {}',
             'engine_update_failed': 'فشل تحديث المحرك: {}',
             'engine_version_label': 'المحرك: yt-dlp {}',
-            'adv_settings': '⚙️ إعدادات متقدمة (كوكيز يوتيوب اختيارية)',
+            'adv_settings': '⚙️ إعدادات متقدمة (أنماط التخطي والكوكيز)',
+            'client_mode_label': 'نمط التخطي والتشغيل:',
+            'client_auto': 'تلقائي ذكي (VisionOS / موصى به)',
+            'client_tv': 'مشغل التلفاز المدمج (TV)',
+            'client_android': 'مشغل أندرويد (Android)',
+            'client_web': 'مشغل الويب العادي (Web)',
             'cookies_label': 'كوكيز يوتيوب (بصيغة Netscape اختيارية):',
             'cookies_placeholder': 'ضع نص الكوكيز هنا إذا واجهت رابطاً محمياً يتطلب تسجيل الدخول...'
         }

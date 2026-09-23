@@ -203,8 +203,21 @@ class RemoOxWebApp:
                 disabled=is_audio
             )
 
-        # Advanced Settings Expander (Cookies support)
+        # Advanced Settings Expander (Bypass client & Cookies support)
         with st.expander(self.translations.get('adv_settings'), expanded=False):
+            client_options = {
+                self.translations.get('client_auto'): 'auto',
+                self.translations.get('client_tv'): 'tv',
+                self.translations.get('client_android'): 'android',
+                self.translations.get('client_web'): 'web'
+            }
+            selected_client_label = st.selectbox(
+                label=self.translations.get('client_mode_label'),
+                options=list(client_options.keys()),
+                index=0
+            )
+            client_mode = client_options[selected_client_label]
+
             cookies_text = st.text_area(
                 label=self.translations.get('cookies_label'),
                 placeholder=self.translations.get('cookies_placeholder'),
@@ -229,16 +242,17 @@ class RemoOxWebApp:
             if not url or len(url.strip()) < 5:
                 st.error(self.translations.get('error_empty_url'))
             else:
-                self.process_download(url.strip(), is_audio, quality_choice, cookies_text)
+                self.process_download(url.strip(), is_audio, quality_choice, cookies_text, client_mode)
 
-    def process_download(self, url, is_audio, quality, cookies_text=None):
+    def process_download(self, url, is_audio, quality, cookies_text=None, client_mode="auto"):
         """Executes the download and handles results."""
         with st.spinner(self.translations.get('processing')):
             success, file_path, filename, mime_type, err = self.downloader.download(
                 url=url,
                 is_audio=is_audio,
                 quality=quality,
-                cookies_text=cookies_text
+                cookies_text=cookies_text,
+                client_mode=client_mode
             )
 
             if success and file_path and os.path.exists(file_path):
