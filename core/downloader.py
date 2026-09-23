@@ -8,7 +8,9 @@ import yt_dlp
 from .config import AppConfig
 
 class MediaDownloader:
-    """Encapsulates media extraction, downloading, and engine updates using yt-dlp and ffmpeg."""
+    """Encapsulates media extraction and downloading using yt-dlp and ffmpeg."""
+
+    DESKTOP_RELEASE_URL = "https://github.com/remonedward/REMO_OX-Downloader/releases/tag/v2.0"
 
     def __init__(self):
         self.temp_dir = AppConfig.ensure_temp_dir()
@@ -37,37 +39,28 @@ class MediaDownloader:
         except Exception as e:
             return False, cls.get_engine_version(), str(e)
 
-    def download(self, url, is_audio=False, quality="1080p", cookies_browser="none", client_mode="auto", cookies_text=None, *args, **kwargs):
+    def download(self, url, is_audio=False, quality="1080p", *args, **kwargs):
         """
-        Downloads and merges media using the exact proven logic from the desktop app.
-        Accepts any argument variation to prevent Streamlit hot-reload TypeErrors.
+        Downloads and merges media from Instagram, TikTok, Facebook, Twitter, and other platforms.
         """
+        # Guard for YouTube links
+        if 'youtube.com' in url.lower() or 'youtu.be' in url.lower():
+            return False, None, None, None, "YOUTUBE_RESTRICTED"
+
         opts = {
             'nocheckcertificate': True,
             'quiet': True,
             'no_warnings': True,
             'geo_bypass': True,
             'outtmpl': os.path.join(self.temp_dir, '%(id)s.%(ext)s'),
-            'js_runtimes': {'node': {}},
         }
-
-        try:
-            from yt_dlp.networking.impersonate import ImpersonateTarget
-            opts['impersonate'] = ImpersonateTarget.from_str('chrome')
-        except Exception:
-            pass
 
         if self.ffmpeg_path:
             opts['ffmpeg_location'] = self.ffmpeg_path
 
-        is_youtube = ('youtube.com' in url.lower() or 'youtu.be' in url.lower())
-
-        # 1. Format configuration (Prioritizing HLS m3u8 for YouTube to prevent 403 on cloud servers)
+        # 1. Format configuration
         if is_audio:
-            if is_youtube:
-                opts['format'] = 'bestaudio[protocol^=m3u8]/bestaudio/best'
-            else:
-                opts['format'] = 'bestaudio/best'
+            opts['format'] = 'bestaudio/best'
             opts['postprocessors'] = [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'mp3',
@@ -82,66 +75,10 @@ class MediaDownloader:
                 "Best Available": "best"
             }
             res_val = quality_map.get(quality, quality)
-            if is_youtube:
-                if res_val != "best":
-                    opts['format'] = f"bestvideo[height<={res_val}][protocol^=m3u8]+bestaudio[protocol^=m3u8]/bestvideo[height<={res_val}]+bestaudio/best[height<={res_val}]/best"
-                else:
-                    opts['format'] = "bestvideo[protocol^=m3u8]+bestaudio[protocol^=m3u8]/bestvideo+bestaudio/best"
+            if res_val != "best":
+                opts['format'] = f"bestvideo[height<={res_val}]+bestaudio/best[height<={res_val}]/best"
             else:
-                if res_val != "best":
-                    opts['format'] = f"bestvideo[height<={res_val}]+bestaudio/best"
-                else:
-                    opts['format'] = 'bestvideo+bestaudio/best'
-
-        # 2. Browser cookies or cookies file
-        cookies_file = None
-        if cookies_text and len(cookies_text.strip()) > 10:
-            cookies_file = os.path.join(self.temp_dir, "session_cookies.txt")
-            with open(cookies_file, "w", encoding="utf-8") as f:
-                f.write(cookies_text.strip())
-            opts['cookiefile'] = cookies_file
-        elif cookies_browser and str(cookies_browser).lower() != 'none':
-            try:
-                browser_name = str(cookies_browser).lower()
-                browser_dirs = {
-                    'chrome': os.path.expanduser('~/.config/google-chrome'),
-                    'edge': os.path.expanduser('~/.config/microsoft-edge'),
-                    'firefox': os.path.expanduser('~/.mozilla/firefox'),
-                    'brave': os.path.expanduser('~/.config/BraveSoftware'),
-                    'opera': os.path.expanduser('~/.config/opera'),
-                }
-                # On Windows desktop it exists in AppData, but on headless cloud container ignore if missing
-                if os.name == 'nt' or os.path.exists(browser_dirs.get(browser_name, '')):
-                    opts['cookiesfrombrowser'] = (browser_name, )
-            except Exception:
-                pass
-
-        # 3. Client bypass mode
-        if client_mode == 'ios':
-            opts['extractor_args'] = {
-                'youtube': {
-                    'player_client': ['ios'],
-                    'player_skip': ['webpage', 'configs']
-                }
-            }
-        elif client_mode == 'android':
-            opts['extractor_args'] = {
-                'youtube': {
-                    'player_client': ['android'],
-                    'player_skip': ['webpage', 'configs']
-                }
-            }
-        elif client_mode == 'web':
-            opts['extractor_args'] = {
-                'youtube': {'player_client': ['web_embedded', 'web']}
-            }
-        else:
-            # Smart Auto (Recommended) - VisionOS + Android ensures 0 403 Forbidden errors on cloud
-            opts['extractor_args'] = {
-                'youtube': {
-                    'player_client': ['visionos', 'android', 'mweb', 'web_creator'],
-                }
-            }
+                opts['format'] = 'bestvideo+bestaudio/best'
 
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
@@ -173,15 +110,4 @@ class MediaDownloader:
                 return True, downloaded_file, final_name, mime_type, None
 
         except Exception as e:
-            err_msg = str(e)
-            if "confirm you're not a bot" in err_msg.lower() or "sign in" in err_msg.lower():
-                err_msg = "BOT_DETECTED"
-            elif "video is unavailable" in err_msg.lower() or "unavailable" in err_msg.lower() or "not available" in err_msg.lower():
-                err_msg = "هذا الفيديو غير متاح على يوتيوب (قد يكون محذوفاً أو خاصاً)."
-            return False, None, None, None, err_msg
-        finally:
-            if cookies_file and os.path.exists(cookies_file):
-                try:
-                    os.remove(cookies_file)
-                except Exception:
-                    pass
+            return False, None, None, None, str(e)

@@ -31,7 +31,7 @@ class RemoOxWebApp:
             st.session_state.download_result = None
 
     def inject_custom_styles(self):
-        """Injects mobile-first responsive CSS styling matching the desktop app."""
+        """Injects mobile-first responsive CSS styling."""
         is_rtl = self.translations.is_rtl
         direction = "rtl" if is_rtl else "ltr"
         text_align = "right" if is_rtl else "left"
@@ -50,7 +50,7 @@ class RemoOxWebApp:
             /* App header */
             .app-header {{
                 text-align: center;
-                padding: 5px 0 15px 0;
+                padding: 5px 0 20px 0;
             }}
             .app-title {{
                 color: #00d2ff;
@@ -84,21 +84,6 @@ class RemoOxWebApp:
                 margin-top: 6px;
             }}
 
-            /* Bypass Card Box matching desktop EXE */
-            .bypass-card {{
-                background-color: #161b22;
-                border: 1.5px solid #2d3748;
-                border-radius: 10px;
-                padding: 15px 18px 10px 18px;
-                margin: 15px 0;
-            }}
-            .bypass-title {{
-                color: #00d2ff;
-                font-size: 0.95rem;
-                font-weight: bold;
-                margin-bottom: 12px;
-            }}
-
             /* Input box */
             .stTextInput input {{
                 border-radius: 8px !important;
@@ -125,6 +110,7 @@ class RemoOxWebApp:
                 border-radius: 8px !important;
                 box-shadow: 0 4px 15px rgba(0, 120, 215, 0.4) !important;
                 transition: all 0.2s ease-in-out !important;
+                margin-top: 10px !important;
             }}
             .stButton > button[kind="primary"]:hover {{
                 background-color: #008aff !important;
@@ -154,18 +140,19 @@ class RemoOxWebApp:
             /* Supported badges */
             .badge-row {{
                 text-align: center;
-                margin-top: 25px;
-                padding-top: 15px;
+                margin-top: 30px;
+                padding-top: 20px;
                 border-top: 1px solid #232936;
             }}
             .platform-tag {{
                 display: inline-block;
                 background: #1e2433;
                 color: #cbd5e0;
-                padding: 4px 10px;
-                margin: 3px;
+                padding: 5px 12px;
+                margin: 4px;
                 border-radius: 6px;
-                font-size: 0.8rem;
+                font-size: 0.85rem;
+                font-weight: 500;
             }}
         </style>
         """, unsafe_allow_html=True)
@@ -202,7 +189,7 @@ class RemoOxWebApp:
         """, unsafe_allow_html=True)
 
     def render_input_section(self):
-        """Renders URL input, format, quality, and the YouTube Bypass Settings box."""
+        """Renders URL input, format, and quality controls."""
         url = st.text_input(
             label=self.translations.get('url_input_label'),
             placeholder=self.translations.get('url_placeholder'),
@@ -226,44 +213,6 @@ class RemoOxWebApp:
                 disabled=is_audio
             )
 
-        # ⚡ YouTube Bypass & Security Settings (Visible on main screen exactly like EXE)
-        st.markdown(f"""
-        <div class="bypass-card">
-            <div class="bypass-title">{self.translations.get('bypass_header')}</div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        col_cook, col_byp = st.columns(2)
-        with col_cook:
-            cookie_options = {
-                self.translations.get('cookie_none'): 'none',
-                self.translations.get('cookie_chrome'): 'chrome',
-                self.translations.get('cookie_edge'): 'edge',
-                self.translations.get('cookie_firefox'): 'firefox',
-                self.translations.get('cookie_brave'): 'brave',
-                self.translations.get('cookie_opera'): 'opera'
-            }
-            selected_cookie_label = st.selectbox(
-                label=self.translations.get('cookies_label'),
-                options=list(cookie_options.keys()),
-                index=0
-            )
-            selected_cookie = cookie_options[selected_cookie_label]
-
-        with col_byp:
-            client_options = {
-                self.translations.get('client_auto'): 'auto',
-                self.translations.get('client_ios'): 'ios',
-                self.translations.get('client_android'): 'android',
-                self.translations.get('client_web'): 'web'
-            }
-            selected_client_label = st.selectbox(
-                label=self.translations.get('client_label'),
-                options=list(client_options.keys()),
-                index=0
-            )
-            selected_client = client_options[selected_client_label]
-
         # Big Download Now Button
         start_clicked = st.button(
             self.translations.get('download_btn'),
@@ -275,17 +224,26 @@ class RemoOxWebApp:
             if not url or len(url.strip()) < 5:
                 st.error(self.translations.get('error_empty_url'))
             else:
-                self.process_download(url.strip(), is_audio, quality_choice, selected_cookie, selected_client)
+                self.process_download(url.strip(), is_audio, quality_choice)
 
-    def process_download(self, url, is_audio, quality, cookies_browser="none", client_mode="auto"):
+    def process_download(self, url, is_audio, quality):
         """Executes the download and handles results."""
+        # Check if YouTube link was provided
+        if 'youtube.com' in url.lower() or 'youtu.be' in url.lower():
+            st.session_state.download_result = None
+            st.warning(f"**{self.translations.get('youtube_blocked_title')}**\n\n{self.translations.get('youtube_blocked_desc')}")
+            st.link_button(
+                label=self.translations.get('download_desktop_btn'),
+                url=MediaDownloader.DESKTOP_RELEASE_URL,
+                use_container_width=True
+            )
+            return
+
         with st.spinner(self.translations.get('processing')):
             success, file_path, filename, mime_type, err = self.downloader.download(
                 url=url,
                 is_audio=is_audio,
-                quality=quality,
-                cookies_browser=cookies_browser,
-                client_mode=client_mode
+                quality=quality
             )
 
             if success and file_path and os.path.exists(file_path):
@@ -307,10 +265,7 @@ class RemoOxWebApp:
                 }
             else:
                 st.session_state.download_result = None
-                if err == "BOT_DETECTED":
-                    st.warning(self.translations.get('bot_warning'))
-                else:
-                    st.error(self.translations.get('error_generic').format(err))
+                st.error(self.translations.get('error_generic').format(err))
 
     def render_download_result(self):
         """Displays the download button to transfer file to phone/computer."""
@@ -334,11 +289,11 @@ class RemoOxWebApp:
         engine_ver = MediaDownloader.get_engine_version()
         st.markdown(f"""
         <div class="badge-row">
-            <span class="platform-tag">🔴 YouTube</span>
-            <span class="platform-tag">🔵 Facebook</span>
             <span class="platform-tag">🟣 Instagram</span>
             <span class="platform-tag">⚫ TikTok</span>
+            <span class="platform-tag">🔵 Facebook</span>
             <span class="platform-tag">⚪ Twitter / X</span>
+            <span class="platform-tag">🔴 Pinterest</span>
             <span class="platform-tag">🌐 1000+ Platforms</span>
             <p style="color: #6b7280; font-size: 0.8rem; margin-top: 15px;">
                 {AppConfig.DISPLAY_NAME} ({AppConfig.VERSION}) • Core: yt-dlp {engine_ver} • Developed by {AppConfig.AUTHOR}
