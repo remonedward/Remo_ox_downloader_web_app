@@ -45,18 +45,18 @@ class RemoOxWebApp:
                 direction: {direction};
                 text-align: {text_align};
                 max-width: 780px;
-                padding-top: 1.8rem;
+                padding-top: 1.5rem;
                 padding-bottom: 3rem;
             }}
             
             /* App title styling */
             .app-header {{
                 text-align: center;
-                padding: 10px 0 20px 0;
+                padding: 5px 0 15px 0;
             }}
             .app-title {{
                 color: #00d2ff;
-                font-size: 2.2rem;
+                font-size: 2.1rem;
                 font-weight: 800;
                 margin-bottom: 6px;
                 letter-spacing: -0.5px;
@@ -64,7 +64,7 @@ class RemoOxWebApp:
             .app-subtitle {{
                 color: #a0aec0;
                 font-size: 0.95rem;
-                margin-bottom: 12px;
+                margin-bottom: 10px;
             }}
             .version-badge {{
                 display: inline-block;
@@ -74,15 +74,6 @@ class RemoOxWebApp:
                 padding: 3px 10px;
                 border-radius: 12px;
                 font-size: 0.75rem;
-            }}
-
-            /* Card container */
-            .stCard {{
-                background-color: #1a1f2c;
-                border: 1px solid #2d3748;
-                border-radius: 12px;
-                padding: 20px;
-                margin-bottom: 20px;
             }}
 
             /* Input box */
@@ -103,7 +94,7 @@ class RemoOxWebApp:
             .stButton > button {{
                 border-radius: 8px !important;
                 font-weight: 600 !important;
-                padding: 10px 20px !important;
+                padding: 8px 16px !important;
                 transition: all 0.2s ease-in-out !important;
             }}
             .stButton > button:hover {{
@@ -143,29 +134,53 @@ class RemoOxWebApp:
                 border-radius: 6px;
                 font-size: 0.8rem;
             }}
+            .engine-tag {{
+                display: inline-block;
+                background: #0f2738;
+                color: #00d2ff;
+                border: 1px solid #00d2ff;
+                padding: 3px 8px;
+                border-radius: 6px;
+                font-size: 0.75rem;
+                margin-top: 8px;
+            }}
         </style>
         """, unsafe_allow_html=True)
 
     def render_header(self):
-        """Renders top header with language switch."""
-        col1, col2 = st.columns([4, 1])
+        """Renders top header with language switch and Update Engine button."""
+        col1, col2, col3 = st.columns([3, 2, 2])
+        
         with col2:
+            # The Update Engine button
+            if st.button(self.translations.get('update_engine_btn'), key="btn_update_engine", use_container_width=True):
+                with st.spinner(self.translations.get('updating_engine')):
+                    ok, version, msg = MediaDownloader.upgrade_engine()
+                    if ok:
+                        st.toast(self.translations.get('engine_updated_success').format(version), icon="✅")
+                    else:
+                        st.error(self.translations.get('engine_update_failed').format(msg))
+                st.rerun()
+
+        with col3:
             current_lang = st.session_state.lang
             lang_label = "English 🇬🇧" if current_lang == 'ar' else "العربية 🇪🇬"
             if st.button(lang_label, key="lang_btn", use_container_width=True):
                 st.session_state.lang = 'en' if current_lang == 'ar' else 'ar'
                 st.rerun()
 
+        engine_ver = MediaDownloader.get_engine_version()
         st.markdown(f"""
         <div class="app-header">
             <span class="version-badge">{self.translations.get('version_tag')}</span>
+            <div class="engine-tag">⚡ {self.translations.get('engine_version_label').format(engine_ver)}</div>
             <h1 class="app-title">{self.translations.get('app_title')}</h1>
             <p class="app-subtitle">{self.translations.get('app_subtitle')}</p>
         </div>
         """, unsafe_allow_html=True)
 
     def render_input_section(self):
-        """Renders URL input and options."""
+        """Renders URL input, format options, and advanced settings."""
         url = st.text_input(
             label=self.translations.get('url_input_label'),
             placeholder=self.translations.get('url_placeholder'),
@@ -188,6 +203,15 @@ class RemoOxWebApp:
                 disabled=is_audio
             )
 
+        # Advanced Settings Expander (Cookies support)
+        with st.expander(self.translations.get('adv_settings'), expanded=False):
+            cookies_text = st.text_area(
+                label=self.translations.get('cookies_label'),
+                placeholder=self.translations.get('cookies_placeholder'),
+                height=80,
+                key="cookies_input"
+            )
+
         col_action, col_clear = st.columns([3, 1])
         with col_action:
             start_clicked = st.button(
@@ -205,15 +229,16 @@ class RemoOxWebApp:
             if not url or len(url.strip()) < 5:
                 st.error(self.translations.get('error_empty_url'))
             else:
-                self.process_download(url.strip(), is_audio, quality_choice)
+                self.process_download(url.strip(), is_audio, quality_choice, cookies_text)
 
-    def process_download(self, url, is_audio, quality):
+    def process_download(self, url, is_audio, quality, cookies_text=None):
         """Executes the download and handles results."""
         with st.spinner(self.translations.get('processing')):
             success, file_path, filename, mime_type, err = self.downloader.download(
                 url=url,
                 is_audio=is_audio,
-                quality=quality
+                quality=quality,
+                cookies_text=cookies_text
             )
 
             if success and file_path and os.path.exists(file_path):
@@ -259,6 +284,7 @@ class RemoOxWebApp:
 
     def render_footer(self):
         """Renders supported platform badges and footer credits."""
+        engine_ver = MediaDownloader.get_engine_version()
         st.markdown(f"""
         <div class="badge-row">
             <span class="platform-tag">🔴 YouTube</span>
@@ -268,7 +294,7 @@ class RemoOxWebApp:
             <span class="platform-tag">⚪ Twitter / X</span>
             <span class="platform-tag">🌐 1000+ Platforms</span>
             <p style="color: #6b7280; font-size: 0.8rem; margin-top: 15px;">
-                {AppConfig.DISPLAY_NAME} ({AppConfig.VERSION}) • Built with Streamlit & yt-dlp by {AppConfig.AUTHOR}
+                {AppConfig.DISPLAY_NAME} ({AppConfig.VERSION}) • Core: yt-dlp {engine_ver} • Developed by {AppConfig.AUTHOR}
             </p>
         </div>
         """, unsafe_allow_html=True)

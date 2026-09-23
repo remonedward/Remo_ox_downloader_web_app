@@ -24,7 +24,15 @@ class TranslationManager:
             'platforms_supported': 'Supports YouTube, Facebook, Instagram, TikTok, X (Twitter), and 1000+ sites.',
             'lang_label': 'Language / اللغة:',
             'clean_btn': 'Clear Cache 🧹',
-            'clean_done': 'Temporary files cleared successfully.'
+            'clean_done': 'Temporary files cleared successfully.',
+            'update_engine_btn': 'Update Engine 🔄',
+            'updating_engine': 'Updating core downloader engine... Please wait.',
+            'engine_updated_success': 'Engine updated successfully! Current version: {}',
+            'engine_update_failed': 'Failed to update engine: {}',
+            'engine_version_label': 'Engine: yt-dlp {}',
+            'adv_settings': '⚙️ Advanced Settings (Optional Cookies)',
+            'cookies_label': 'YouTube Cookies (Optional Netscape format):',
+            'cookies_placeholder': 'Paste cookies.txt content here to bypass strict restrictions if any...'
         },
         'ar': {
             'app_title': 'ريمـو أوكـس - محمل الفيديوهات (ويب)',
@@ -48,7 +56,15 @@ class TranslationManager:
             'platforms_supported': 'يدعم يوتيوب، فيسبوك، إنستغرام، تيك توك، تويتر، وأكثر من 1000 موقع عالمي.',
             'lang_label': 'اللغة / Language:',
             'clean_btn': 'تنظيف الذاكرة 🧹',
-            'clean_done': 'تم مسح الملفات المؤقتة بنجاح.'
+            'clean_done': 'تم مسح الملفات المؤقتة بنجاح.',
+            'update_engine_btn': 'تحديث المحرك 🔄',
+            'updating_engine': 'جاري تحديث محرك التحميل إلى أحدث إصدار... يرجى الانتظار.',
+            'engine_updated_success': 'تم تحديث المحرك بنجاح! الإصدار الحالي: {}',
+            'engine_update_failed': 'فشل تحديث المحرك: {}',
+            'engine_version_label': 'المحرك: yt-dlp {}',
+            'adv_settings': '⚙️ إعدادات متقدمة (كوكيز يوتيوب اختيارية)',
+            'cookies_label': 'كوكيز يوتيوب (بصيغة Netscape اختيارية):',
+            'cookies_placeholder': 'ضع نص الكوكيز هنا إذا واجهت رابطاً محمياً يتطلب تسجيل الدخول...'
         }
     }
 

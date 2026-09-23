@@ -1,18 +1,48 @@
 import os
+import sys
 import glob
 import re
+import subprocess
+import importlib
 import yt_dlp
 from .config import AppConfig
 
 class MediaDownloader:
-    """Encapsulates media extraction and downloading using yt-dlp and ffmpeg."""
+    """Encapsulates media extraction, downloading, and engine updates using yt-dlp and ffmpeg."""
 
     def __init__(self):
         self.temp_dir = AppConfig.ensure_temp_dir()
         self.ffmpeg_path = AppConfig.get_ffmpeg_path()
 
-    def get_base_options(self):
-        """Builds standard robust extraction options."""
+    @staticmethod
+    def get_engine_version():
+        """Returns the current yt-dlp version."""
+        try:
+            return yt_dlp.version.__version__
+        except Exception:
+            return "Unknown"
+
+    @classmethod
+    def upgrade_engine(cls):
+        """
+        Updates yt-dlp to the latest release directly from PyPI/GitHub.
+        Works both locally and in web environments.
+        """
+        try:
+            cmd = [sys.executable, "-m", "pip", "install", "--upgrade", "yt-dlp"]
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            
+            # Reload module dynamically in runtime
+            global yt_dlp
+            yt_dlp = importlib.reload(yt_dlp)
+            new_version = yt_dlp.version.__version__
+            
+            return True, new_version, result.stdout
+        except Exception as e:
+            return False, cls.get_engine_version(), str(e)
+
+    def get_base_options(self, cookies_file=None):
+        """Builds standard robust extraction options that bypass 403 Forbidden and bot checks."""
         opts = {
             'nocheckcertificate': True,
             'quiet': True,
@@ -20,17 +50,22 @@ class MediaDownloader:
             'geo_bypass': True,
             'extractor_args': {
                 'youtube': {
-                    'player_client': ['ios', 'android', 'web_creator', 'tv_embedded', 'mweb'],
+                    'player_client': ['default', 'mweb', 'android', 'ios'],
+                    'player_skip': ['configs']
                 }
             }
         }
         if self.ffmpeg_path:
             opts['ffmpeg_location'] = self.ffmpeg_path
+
+        if cookies_file and os.path.exists(cookies_file):
+            opts['cookiefile'] = cookies_file
+
         return opts
 
-    def extract_info(self, url):
+    def extract_info(self, url, cookies_file=None):
         """Fetches metadata without downloading."""
-        opts = self.get_base_options()
+        opts = self.get_base_options(cookies_file=cookies_file)
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(url, download=False)
@@ -44,15 +79,21 @@ class MediaDownloader:
                 }
         except Exception as e:
             err = str(e)
-            if "confirm you're not a bot" in err.lower():
+            if "confirm you're not a bot" in err.lower() or "sign in" in err.lower():
                 err = "BOT_DETECTED"
             return {'success': False, 'error': err}
 
-    def download(self, url, is_audio=False, quality="Best Available"):
+    def download(self, url, is_audio=False, quality="Best Available", cookies_text=None):
         """Downloads and converts media file, returning its path and metadata."""
-        opts = self.get_base_options()
+        cookies_file = None
+        if cookies_text and len(cookies_text.strip()) > 10:
+            cookies_file = os.path.join(self.temp_dir, "session_cookies.txt")
+            with open(cookies_file, "w", encoding="utf-8") as f:
+                f.write(cookies_text.strip())
+
+        opts = self.get_base_options(cookies_file=cookies_file)
         
-        # Output template with safe ASCII/sanitized filename
+        # Output template with safe sanitized filename
         output_template = os.path.join(self.temp_dir, '%(id)s_%(epoch)s.%(ext)s')
         opts['outtmpl'] = output_template
 
@@ -64,7 +105,6 @@ class MediaDownloader:
                 'preferredquality': '192',
             }]
         else:
-            # Map quality
             quality_map = {
                 "1080p": "1080",
                 "720p": "720",
@@ -81,14 +121,12 @@ class MediaDownloader:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 info = ydl.extract_info(url, download=True)
                 title = info.get('title', 'downloaded_media')
-                # Clean title for saving
                 clean_title = re.sub(r'[\\/*?:"<>|]', "", title)
 
                 # Locate the newly downloaded file
                 target_ext = 'mp3' if is_audio else info.get('ext', 'mp4')
                 downloaded_file = None
                 
-                # Check directly prepared filename
                 expected_fn = ydl.prepare_filename(info)
                 if is_audio:
                     base, _ = os.path.splitext(expected_fn)
@@ -97,7 +135,6 @@ class MediaDownloader:
                 if os.path.exists(expected_fn):
                     downloaded_file = expected_fn
                 else:
-                    # Search by ID in temp dir
                     media_id = info.get('id', '')
                     matches = glob.glob(os.path.join(self.temp_dir, f"{media_id}_*.*"))
                     if matches:
@@ -114,6 +151,12 @@ class MediaDownloader:
 
         except Exception as e:
             err = str(e)
-            if "confirm you're not a bot" in err.lower():
+            if "confirm you're not a bot" in err.lower() or "sign in" in err.lower():
                 err = "BOT_DETECTED"
             return False, None, None, None, err
+        finally:
+            if cookies_file and os.path.exists(cookies_file):
+                try:
+                    os.remove(cookies_file)
+                except Exception:
+                    pass
