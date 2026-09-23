@@ -37,9 +37,10 @@ class MediaDownloader:
         except Exception as e:
             return False, cls.get_engine_version(), str(e)
 
-    def download(self, url, is_audio=False, quality="1080p", cookies_browser="none", client_mode="auto"):
+    def download(self, url, is_audio=False, quality="1080p", cookies_browser="none", client_mode="auto", cookies_text=None, *args, **kwargs):
         """
         Downloads and merges media using the exact proven logic from the desktop app.
+        Accepts any argument variation to prevent Streamlit hot-reload TypeErrors.
         """
         opts = {
             'nocheckcertificate': True,
@@ -47,6 +48,7 @@ class MediaDownloader:
             'no_warnings': True,
             'geo_bypass': True,
             'outtmpl': os.path.join(self.temp_dir, '%(id)s.%(ext)s'),
+            'js_runtimes': {'node': {}},
         }
 
         if self.ffmpeg_path:
@@ -74,10 +76,16 @@ class MediaDownloader:
             else:
                 opts['format'] = 'bestvideo+bestaudio/best'
 
-        # 2. Browser cookies identical to desktop app
-        if cookies_browser and cookies_browser.lower() != 'none':
+        # 2. Browser cookies or cookies file
+        cookies_file = None
+        if cookies_text and len(cookies_text.strip()) > 10:
+            cookies_file = os.path.join(self.temp_dir, "session_cookies.txt")
+            with open(cookies_file, "w", encoding="utf-8") as f:
+                f.write(cookies_text.strip())
+            opts['cookiefile'] = cookies_file
+        elif cookies_browser and str(cookies_browser).lower() != 'none':
             try:
-                opts['cookiesfrombrowser'] = (cookies_browser.lower(), )
+                opts['cookiesfrombrowser'] = (str(cookies_browser).lower(), )
             except Exception:
                 pass
 
@@ -101,10 +109,10 @@ class MediaDownloader:
                 'youtube': {'player_client': ['web']}
             }
         else:
-            # Smart Auto (Recommended) - Exact desktop extractor args
+            # Smart Auto (Recommended) - visionos + android works seamlessly without 403 on cloud
             opts['extractor_args'] = {
                 'youtube': {
-                    'player_client': ['ios', 'android', 'web_creator', 'tv_embedded', 'mweb'],
+                    'player_client': ['visionos', 'android', 'mweb', 'web_creator'],
                 }
             }
 
@@ -142,3 +150,9 @@ class MediaDownloader:
             if "confirm you're not a bot" in err_msg.lower() or "sign in" in err_msg.lower():
                 err_msg = "BOT_DETECTED"
             return False, None, None, None, err_msg
+        finally:
+            if cookies_file and os.path.exists(cookies_file):
+                try:
+                    os.remove(cookies_file)
+                except Exception:
+                    pass
