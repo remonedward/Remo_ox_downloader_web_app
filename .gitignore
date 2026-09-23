@@ -7,3 +7,4 @@ temp_downloads/
 .venv/
 venv/
 *.tmp
+README_AR.md

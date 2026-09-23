@@ -1,128 +1,130 @@
 # REMO_OX Downloader Web (v0.1) 🌐⚡
 
-تطبيق ويب متطور ومتجاوب بالكامل لتحميل الفيديوهات والمقاطع الصوتية بجودة عالية من أشهر منصات التواصل الاجتماعي العالمية (**إنستغرام، تيك توك، فيسبوك، تويتر/إكس، بنترست، وأكثر من 1000 منصة أخرى**).
+A modern, responsive, and high-performance web application designed to download videos and audio in high quality from popular social media platforms (**Instagram, TikTok, Facebook, Twitter/X, Pinterest, Vimeo, and 1000+ sites**).
 
-مبني باستخدام **Python**، **Streamlit**، و **yt-dlp** ومصمم ليعمل بسلاسة فائقة كتطبيق مستقل على كافة الأجهزة: **الهواتف الذكية (iPhone عبر Safari، و Android عبر Chrome)** وكذلك أجهزة الكمبيوتر (**Mac, Windows, Linux**).
+Built using **Python**, **Streamlit**, and **yt-dlp**, and engineered to run seamlessly across all devices: **Mobile Phones (iPhone via Safari, Android via Chrome)** and **Desktops (Mac, Windows, Linux)**.
 
 ---
 
-## 🌟 مميزات الإصدار (v0.1)
+## 🌟 Key Features (v0.1)
 
-1. **متوافق مع جميع الأجهزة (Cross-Platform):**
-   * يعمل مباشرة عبر متصفح الويب دون الحاجة لتثبيت أي برامج إضافية على الهاتف.
-   * متجاوب بالكامل مع شاشات الهواتف المحمولة (Mobile-First UI).
+1. **Cross-Platform & Mobile-First:**
+   * Runs directly inside any modern web browser without requiring software installation on mobile devices.
+   * Responsive layout optimized for smartphones, tablets, and desktops.
 
-2. **تثبيت كأيقونة على شاشة الهاتف (PWA App Shortcut):**
-   * إمكانية إضافة اختصار التطبيق مباشرة على الشاشة الرئيسية لهواتف **iPhone (عبر Safari)** وهواتف **Android (عبر Chrome)**.
-   * يعمل بوضع ملء الشاشة المستقل (Standalone Mode) بدون شريط المتصفح، مما يعطي تجربة تطبيق أصلي كامل.
+2. **Mobile Home Screen App Shortcut (PWA):**
+   * Users can easily add the app as a standalone icon on their **iPhone (Safari)** or **Android (Chrome)** home screens.
+   * Launches in full-screen standalone mode without browser bars, providing a native app experience.
 
-3. **دعم المنصات السحابية بكفاءة 100%:**
-   * تحميل فوري وسريع للفيديوهات والريلز من:
-     * 🟣 **إنستغرام (Instagram Reels & Posts)**
-     * ⚫ **تيك توك (TikTok بدون علامة مائية)**
-     * 🔵 **فيسبوك (Facebook Videos & Reels)**
-     * ⚪ **تويتر / إكس (Twitter/X)**
-     * 🔴 **بنترست (Pinterest)**
-     * 🌐 **أكثر من 1000 منصة وموقع وسائط عالمي**
+3. **100% Cloud-Optimized Platforms:**
+   * Fast, reliable video and audio extraction from:
+     * 🟣 **Instagram (Reels, Stories & Posts)**
+     * ⚫ **TikTok (Watermark-free HD)**
+     * 🔵 **Facebook (Videos & Reels)**
+     * ⚪ **Twitter / X**
+     * 🔴 **Pinterest**
+     * 🌐 **1000+ Online Media Platforms**
 
-4. **توجيه ذكي خاص بيوتيوب (YouTube Smart Handling):**
-   * نظراً لأن يوتيوب يفرض حظراً أمنياً على السيرفرات السحابية (AWS Datacenter IPs)، يقوم التطبيق بتنبيه المستخدم فوراً وتوفير زر تحميل مباشر بنقرة واحدة لتطبيق الكمبيوتر المخصص الخالي من أي قيود:  
+4. **Smart YouTube Handling:**
+   * Because YouTube restricts downloads originating from datacenter/cloud hosting server IPs (AWS), the web app detects YouTube links and provides an immediate one-click direct download button for the free, restriction-free Windows Desktop App:  
      `REMO_OX_Downloader_v2.exe`
 
-5. **واجهة نظيفة وخاصة بالكامل (Clean & Private UI):**
-   * إخفاء شريط أدوات Streamlit وأيقونات GitHub وزر الـ Fork للحفاظ على خصوصية المشروع.
-   * إخفاء لوحة إدارة السيرفرات عن الزوار، بحيث لا يمكن التحكم بالتطبيق إلا للمطور المعتمد.
+5. **Clean & Private Interface:**
+   * Streamlit headers, GitHub fork buttons, and repository links are completely hidden.
+   * Server management widgets and log access are hidden from public visitors, ensuring privacy and security.
 
-6. **تحميل مباشر وحفظ على الجهاز (Direct Device Download):**
-   * بمجرد اكتمال المعالجة، يظهر زر تحميل فوري لحفظ الملف مباشرة في تطبيق **Files** أو **الصور** على الآيفون، ومجلد **Downloads** على الأندرويد والكمبيوتر.
+6. **Direct Device Download:**
+   * Once processing finishes, a direct download button allows instant saving to **Files / Photos** on iOS, and the **Downloads** directory on Android, Windows, and Mac.
 
-7. **دعم كامل للغتين (العربية والإنجليزية):**
-   * واجهة تدعم اتجاه الكتابة من اليمين لليسار (RTL) بالعربية مع زر تبديل فوري للإنجليزية.
+7. **Bilingual Support (Arabic & English):**
+   * Real-time language switching with full Right-to-Left (RTL) layout support for Arabic and Left-to-Right (LTR) for English.
 
-8. **تحديد الصيغة والجودة:**
-   * فيديو عالي الدقة (MP4) أو استخراج صوت نقي (MP3 192kbps).
+8. **Format & Resolution Control:**
+   * Download high-definition video (MP4) or extract pure audio (MP3 192kbps).
 
-9. **تنظيف تلقائي للذاكرة (Auto Temp Cleanup):**
-   * حذف تلقائي ودوري للملفات المؤقتة من السيرفر لحفظ المساحة والأمان.
+9. **Automatic Server Maintenance:**
+   * Background temp file cleaner automatically purges processed files to preserve disk space and ensure privacy.
 
 ---
 
-## 🏗️ معمارية المشروع (OOP Architecture)
+## 🏗️ Architecture & OOP Design
 
-تم بناء المشروع بالكامل وفق أسلوب البرمجة كائنية التوجه **(Object-Oriented Programming)**:
+The project is structured according to **Object-Oriented Programming (OOP)** principles:
 
 ```text
 Remo_ox_downloader_web_app/
 │
-├── app.py                      # كلاس التحكم الرئيسي بالواجهة (RemoOxWebApp)
-├── requirements.txt            # مكتبات بايثون المطلوبة (streamlit, yt-dlp, requests)
-├── packages.txt                # تثبيت محرك FFmpeg تلقائياً على سيرفرات السحابة
-├── README.md                   # التوثيق الشامل ودليل الاستخدام
+├── app.py                      # Main Application Controller (RemoOxWebApp)
+├── requirements.txt            # Python dependencies (streamlit, yt-dlp, requests)
+├── packages.txt                # Linux system dependencies (ffmpeg)
+├── README.md                   # Official GitHub repository documentation (English)
 │
 ├── .streamlit/
-│   └── config.toml             # تخصيص ثيم الوضع الليلي (Dark Theme) والأداء وإخفاء الأدوات
+│   └── config.toml             # Dark theme styling, server settings, and UI customization
 │
 └── core/
     ├── __init__.py
-    ├── config.py               # كلاس إدارة الإعدادات والمسارات (AppConfig)
-    ├── downloader.py           # كلاس محرك التحميل والدمج (MediaDownloader)
-    ├── translations.py         # كلاس إدارة اللغات والترجمة (TranslationManager)
-    └── cleaner.py              # كلاس تنظيف الملفات المؤقتة من السيرفر (TempCleaner)
+    ├── config.py               # Application configurations and path management (AppConfig)
+    ├── downloader.py           # Core media extraction and conversion engine (MediaDownloader)
+    ├── translations.py         # Bilingual localization and direction manager (TranslationManager)
+    └── cleaner.py              # Server temporary file garbage collection (TempCleaner)
 ```
 
-### تفصيل الكلاسات البرمجية:
-* **`RemoOxWebApp` (`app.py`):** الكلاس المركزي المسؤول عن دورة حياة التطبيق، إدارة الجلسات (`st.session_state`)، رسم الواجهة، والتعامل مع طلبات التنزيل وتثبيت شورت كت الهاتف.
-* **`MediaDownloader` (`core/downloader.py`):** المسؤول عن الاتصال بمحرك `yt-dlp` وتنسيق استخراج الوسائط ودمجها عبر `FFmpeg`، والتوجيه المباشر لتطبيق سطح المكتب لروابط يوتيوب.
-* **`TranslationManager` (`core/translations.py`):** المسؤول عن توفير نصوص اللغتين العربية والإنجليزية وتغيير اتجاه الصفحة ديناميكياً (RTL/LTR).
-* **`AppConfig` (`core/config.py`):** يحتوي على الثوابت، رقم الإصدار (v0.1)، وفحص وجود محرك `FFmpeg`.
-* **`TempCleaner` (`core/cleaner.py`):** يقوم بفحص مجلد التنزيلات المؤقتة وحذف الملفات القديمة لتفادي امتلاء مساحة السيرفر.
+### Module Responsibilities:
+* **`RemoOxWebApp` (`app.py`):** Central controller managing app lifecycle, session state (`st.session_state`), UI rendering, event handling, and PWA setup.
+* **`MediaDownloader` (`core/downloader.py`):** Interfaces with `yt-dlp` and `FFmpeg` for media extraction, format handling, and smart YouTube desktop redirection.
+* **`TranslationManager` (`core/translations.py`):** Bilingual dictionary managing Arabic and English text resources with dynamic text-direction alignment.
+* **`AppConfig` (`core/config.py`):** Holds application constants, supported resolutions, and locates `FFmpeg` on Linux and Windows.
+* **`TempCleaner` (`core/cleaner.py`):** Periodically purges stale files from the server's temporary downloads cache.
 
 ---
 
-## 📲 كيفية تثبيت التطبيق كأيقونة على شاشة الهاتف (Shortcut)
+## 📲 Installing as a Mobile Home Screen App (PWA)
 
-### 🍏 لهواتف آيفون (iPhone عبر متصفح Safari):
-1. افتح رابط التطبيق في متصفح **Safari**.
-2. اضغط على زر **المشاركة** `⎋` (المربع الذي يحتوي على سهم لأعلى في الأسفل).
-3. اسحب للأسفل واختر **"إضافة إلى الصفحة الرئيسية"** `➕` (Add to Home Screen).
-4. اضغط على **"إضافة"** (Add) في أعلى اليمين.
-*ستظهر أيقونة التطبيق على شاشة هاتفك وتفتح كتطبيق كامل ملء الشاشة بدون شريط المتصفح.*
+### 🍏 iPhone & iPad (Safari):
+1. Open the application link in **Safari**.
+2. Tap the **Share** button `⎋` (the square with an upward arrow at the bottom).
+3. Scroll down and select **"Add to Home Screen"** `➕`.
+4. Tap **"Add"** in the top right corner.  
+*The app icon will appear on your home screen and open in full-screen standalone mode.*
 
-### 🤖 لهواتف أندرويد (Android عبر متصفح Chrome):
-1. افتح رابط التطبيق في متصفح **Chrome**.
-2. اضغط على قائمة **الثلاث نقاط** `⋮` في الزاوية العلوية.
-3. اضغط على **"تثبيت التطبيق"** (Install app) أو **"إضافة إلى الشاشة الرئيسية"** `➕`.
-4. اضغط على **"تثبيت"** للتأكيد.
-*ستضاف أيقونة التطبيق إلى قائمة تطبيقات الهاتف فوراً.*
-
----
-
-## 💾 كيف يحدد المستخدم مجلد الحفظ على جهازه؟
-
-تعمل المتصفحات الحديثة وفق نظام حماية أمني صارم (Browser Sandbox) يمنع صفحات الويب من الاطلاع على مجلدات الهارد ديسك مباشرة. ولكن يمكن للمستخدم تفعيل خيار السؤال عن مكان الحفظ لمرة واحدة كالتالي:
-* **على الكمبيوتر (Chrome / Edge):** من الإعدادات ⬅️ التنزيلات (Downloads) ⬅️ تفعيل خيار **"السؤال عن مكان حفظ كل ملف قبل تنزيله"**.
-* **على هواتف آيفون:** بعد التحميل، يمكن الضغط على الملف واختيار **"حفظ في الملفات" (Save to Files)** واختيار أي مجلد في الهاتف أو iCloud، أو اختيار **"حفظ الفيديو" (Save Video)** لنقله لألبوم الصور مباشرة.
+### 🤖 Android Devices (Chrome):
+1. Open the application link in **Google Chrome**.
+2. Tap the **three dots menu** `⋮` in the top right corner.
+3. Tap **"Install app"** or **"Add to Home screen"** `➕`.
+4. Confirm by tapping **"Install"**.  
+*The app will be installed directly to your app launcher and home screen.*
 
 ---
 
-## 💻 التشغيل المحلي والتطوير (Local Development)
+## 💾 Choosing the Download Folder
 
-لتشغيل التطبيق محلياً على جهازك:
+Web browsers run within a strict security sandbox that prevents websites from accessing or modifying local disk directories directly. However, users can configure their browsers to prompt for the target directory:
+* **Desktop (Chrome / Edge):** Go to **Settings ➡️ Downloads ➡️ Enable "Ask where to save each file before downloading"**.
+* **iOS (iPhone / iPad):** After downloading, tap the file in Safari downloads and choose **"Save to Files"** to pick any local or iCloud folder, or select **"Save Video"** to export directly to the Camera Roll.
+
+---
+
+## 💻 Local Development
+
+To run the application locally on your computer:
 
 ```bash
-# الانتقال لمجلد التطبيق
+# Navigate to the project directory
 cd Remo_ox_downloader_web_app
 
-# تشغيل التطبيق عبر Streamlit
+# Launch the Streamlit server
 streamlit run app.py
 ```
 
-سيفتح المتصفح تلقائياً على الرابط المحلي:  
+The app will open automatically in your default browser at:  
 `http://localhost:8501`
 
 ---
 
-## 🌐 رابط النسخة الحية على السحابة:
+## 🌐 Live Web Application
+
+Access the deployed cloud version here:  
 **[remodownloader.streamlit.app](https://remodownloader.streamlit.app)**
 
 ---
